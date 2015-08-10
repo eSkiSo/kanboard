@@ -728,8 +728,16 @@ class TaskFilter extends Base
             $bars[] = array(
                 'id' => $task['id'],
                 'title' => $task['title'],
-                'start' => date(DATE_RFC822, $this->dateParser->removeTimeFromTimestamp($start)),
-                'end' => date(DATE_RFC822, $this->dateParser->removeTimeFromTimestamp($end)),
+                'start' => array(
+                    (int) date('Y', $start),
+                    (int) date('n', $start),
+                    (int) date('j', $start),
+                ),
+                'end' => array(
+                    (int) date('Y', $end),
+                    (int) date('n', $end),
+                    (int) date('j', $end),
+                ),
                 'column_title' => $task['column_title'],
                 'assignee' => $task['assignee_name'] ?: $task['assignee_username'],
                 'progress' => $this->task->getProgress($task, $columns[$task['project_id']]).'%',

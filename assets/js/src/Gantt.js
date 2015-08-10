@@ -305,13 +305,10 @@ Gantt.prototype.getDates = function(start, end) {
 // Convert data to Date object
 Gantt.prototype.prepareData = function(data) {
     for (var i = 0; i < data.length; i++) {
-
-        var start = new Date();
-        start.setTime(Date.parse(data[i].start));
+        var start = new Date(Date.UTC(data[i].start[0], data[i].start[1] - 1, data[i].start[2], 0, 0, 0, 0));
         data[i].start = start;
 
-        var end = new Date();
-        end.setTime(Date.parse(data[i].end));
+        var end = new Date(Date.UTC(data[i].end[0], data[i].end[1] - 1, data[i].end[2], 0, 0, 0, 0));
         data[i].end = end;
     }
 
