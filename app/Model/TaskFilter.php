@@ -108,6 +108,8 @@ class TaskFilter extends Base
             Task::TABLE.'.date_due',
             Task::TABLE.'.date_creation',
             Task::TABLE.'.is_active',
+            Task::TABLE.'.position',
+            Board::TABLE.'.position AS column_position',
             Board::TABLE.'.title AS column_title',
             User::TABLE.'.name AS assignee_name',
             User::TABLE.'.username AS assignee_username'
@@ -732,7 +734,7 @@ class TaskFilter extends Base
                 'assignee' => $task['assignee_name'] ?: $task['assignee_username'],
                 'progress' => $this->task->getProgress($task, $columns[$task['project_id']]).'%',
                 'link' => $this->helper->url->href('task', 'show', array('project_id' => $task['project_id'], 'task_id' => $task['id'])),
-                'color' => $this->color->getBackgroundColor($task['color_id']),
+                'color' => $this->color->getColorProperties($task['color_id']),
                 'not_defined' => empty($task['date_due']) || empty($task['date_started']),
             );
         }

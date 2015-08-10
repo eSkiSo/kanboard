@@ -15,27 +15,28 @@
                 <i class="fa fa-th fa-fw"></i>
                 <?= $this->url->link(t('Back to the board'), 'board', 'show', array('project_id' => $project['id'])) ?>
             </li>
-            <li>
-                <i class="fa fa-calendar fa-fw"></i>
-                <?= $this->url->link(t('Back to the calendar'), 'calendar', 'show', array('project_id' => $project['id'])) ?>
+        </ul>
+        <ul class="views toolbar">
+            <li <?= $sorting === 'board' ? 'class="active"' : '' ?>>
+                <i class="fa fa-sort-numeric-asc fa-fw"></i>
+                <?= $this->url->link(t('Sort by position'), 'gantt', 'project', array('project_id' => $project['id'], 'sorting' => 'board')) ?>
             </li>
-            <?php if ($this->user->isManager($project['id'])): ?>
-            <li>
-                <i class="fa fa-cog fa-fw"></i>
-                <?= $this->url->link(t('Project settings'), 'project', 'show', array('project_id' => $project['id'])) ?>
+            <li <?= $sorting === 'date' ? 'class="active"' : '' ?>>
+                <i class="fa fa-sort-amount-asc fa-fw"></i>
+                <?= $this->url->link(t('Sort by date'), 'gantt', 'project', array('project_id' => $project['id'], 'sorting' => 'date')) ?>
             </li>
-            <?php endif ?>
             <li>
-                <i class="fa fa-folder fa-fw"></i>
-                <?= $this->url->link(t('All projects'), 'project', 'index') ?>
+                <i class="fa fa-plus fa-fw"></i>
+                <?= $this->url->link(t('Add task'), 'gantt', 'task', array('project_id' => $project['id']), false, 'popover') ?>
             </li>
         </ul>
     </div>
+
     <?php if (! empty($tasks)): ?>
         <div
             id="gantt-chart"
             data-tasks='<?= json_encode($tasks) ?>'
-            data-save-url="<?= $this->url->href('gantt', 'save', array('project_id' => $project['id'])) ?>"
+            data-save-url="<?= $this->url->href('gantt', 'saveDate', array('project_id' => $project['id'])) ?>"
             data-label-start-date="<?= t('Start date:') ?>"
             data-label-end-date="<?= t('Due date:') ?>"
             data-label-assignee="<?= t('Assignee:') ?>"

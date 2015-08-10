@@ -25,10 +25,17 @@ class TaskCreation extends Base
             return 0;
         }
 
+        $position = empty($values['position']) ? 0 : $values['position'];
+
         $this->prepare($values);
         $task_id = $this->persist(Task::TABLE, $values);
 
         if ($task_id !== false) {
+
+            if ($position > 0 && $values['position'] > 1) {
+                $this->taskPosition->movePosition($values['project_id'], $task_id, $values['column_id'], $position, $values['swimlane_id'], false);
+            }
+
             $this->fireEvents($task_id, $values);
         }
 

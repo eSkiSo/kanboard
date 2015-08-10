@@ -176,20 +176,14 @@ Gantt.prototype.addBlocks = function(slider, start) {
             text.append(this.data[i].progress);
         }
 
-        if (this.data[i].not_defined) {
-            block.addClass("ganttview-block-not-defined");
-        }
-        else if (this.data[i].color) {
-            block.css("background-color", this.data[i].color);
-        }
-
         block.data("task", this.data[i]);
-
+        this.setTaskColor(block, this.data[i]);
         jQuery(rows[rowIdx]).append(block);
         rowIdx = rowIdx + 1;
     }
 };
 
+// Get tooltip for task bars
 Gantt.prototype.getBarTooltip = function(task) {
 
     if (task.not_defined) {
@@ -200,6 +194,17 @@ Gantt.prototype.getBarTooltip = function(task) {
         $(this.options.container).data("label-assignee") + " " + (task.assignee ? task.assignee : '') + "<br/>" +
         $(this.options.container).data("label-start-date") + " " + $.datepicker.formatDate('yy-mm-dd', task.start) + "<br/>" +
         $(this.options.container).data("label-end-date") + " " + $.datepicker.formatDate('yy-mm-dd', task.end);
+};
+
+// Set task color
+Gantt.prototype.setTaskColor = function(block, task) {
+    if (task.not_defined) {
+        block.addClass("ganttview-block-not-defined");
+    }
+    else {
+        block.css("background-color", task.color.background);
+        block.css("border-color", task.color.border);
+    }
 };
 
 // Setup jquery-ui resizable
@@ -237,28 +242,30 @@ Gantt.prototype.updateDataAndPosition = function(block, startDate) {
     var container = jQuery("div.ganttview-slide-container", this.options.container);
     var scroll = container.scrollLeft();
     var offset = block.offset().left - container.offset().left - 1 + scroll;
+    var task = block.data("task");
 
     // Restore color for defined block
-    block.data("task").not_defined = false;
-    block.removeClass("ganttview-block-not-defined");
-    block.css("background-color", block.data("task").color);
+    task.not_defined = false;
+    this.setTaskColor(block, task);
 
     // Set new start date
     var daysFromStart = Math.round(offset / this.options.cellWidth);
     var newStart = this.addDays(this.cloneDate(startDate), daysFromStart);
-    block.data("task").start = newStart;
+    task.start = newStart;
 
     // Set new end date
     var width = block.outerWidth();
     var numberOfDays = Math.round(width / this.options.cellWidth) - 1;
-    block.data("task").end = this.addDays(this.cloneDate(newStart), numberOfDays);
+    task.end = this.addDays(this.cloneDate(newStart), numberOfDays);
 
     if (numberOfDays > 0) {
-        jQuery("div.ganttview-block-text", block).text(block.data("task").progress);
+        jQuery("div.ganttview-block-text", block).text(task.progress);
     }
 
     // Update tooltip
-    block.attr("title", this.getBarTooltip(block.data("task")));
+    block.attr("title", this.getBarTooltip(task));
+
+    block.data("task", task);
 
     // Remove top and left properties to avoid incorrect block positioning,
     // set position to relative to keep blocks relative to scrollbar when scrolling
@@ -342,6 +349,9 @@ Gantt.prototype.getDateRange = function(minDays) {
     if (this.daysBetween(minStart, maxEnd) < minDays) {
         maxEnd = this.addDays(this.cloneDate(minStart), minDays);
     }
+
+    // Always start one day before the minStart
+    minStart.setDate(minStart.getDate() - 1);
 
     return [minStart, maxEnd];
 };
